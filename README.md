@@ -201,17 +201,6 @@ RECIBIDO → EN DIAGNÓSTICO → ESPERA DE APROBACIÓN
    - Seleccionar calificación (1-5 estrellas)
    - Agregar comentario opcional
 
-<div align="center">
-
-### 📱 Adaptable a Cualquier Dispositivo
-
-| Dispositivo | Resolución | Características |
-|:---:|:---:|:---|
-| 📱 **Móvil** | 320px - 640px | • Layout vertical apilado<br>• Menú hamburguesa<br>• Botones táctiles grandes |
-| 📲 **Tablet** | 641px - 1023px | • Layout de 2 columnas<br>• Navegación completa<br>• Optimización táctil |
-| 💻 **Desktop** | 1024px+ | • Grids de hasta 4 columnas<br>• Dashboard completo<br>• Experiencia premium |
-
-</div>
 ---
 
 ## � Modelos de Base de Datos
