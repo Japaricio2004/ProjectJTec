@@ -269,8 +269,6 @@ Este proyecto está bajo la **Licencia MIT** - mira el archivo [LICENSE](LICENSE
 
 ---
 
-## 🌟 Agradecimientos
-
 ### 💖 Si este proyecto te resultó útil
 
 <div align="center">
@@ -283,10 +281,7 @@ Este proyecto está bajo la **Licencia MIT** - mira el archivo [LICENSE](LICENSE
 
 ---
 
-<img src="https://img.shields.io/badge/Made_with-❤️-red?style=for-the-badge" />
-<img src="https://img.shields.io/badge/Built_by-JOSETEC_Team-blue?style=for-the-badge" />
-
-**Desarrollado con pasión por un equipo dedicado a la excelencia** 🚀
+**Desarrollado con dedicación y esfuerzo individual** 🚀
 
 ---
 
