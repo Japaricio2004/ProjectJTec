@@ -14,8 +14,6 @@
 
 *Un sistema web completo y moderno que conecta técnicos con clientes en tiempo real*
 
-[🌟 Demo](#-características-principales) • [📦 Instalación](#-instalación-y-configuración) • [📖 Documentación](#-uso-del-sistema) • [🤝 Contribuir](#-contribución)
-
 ---
 
 </div>
@@ -167,79 +165,7 @@ RECIBIDO → EN DIAGNÓSTICO → ESPERA DE APROBACIÓN
 
 ---
 
-## 🚀 Instalación y Configuración
-
-### 📋 Prerrequisitos
-
-<div align="center">
-
-| Requisito | Versión Mínima |
-|:---:|:---:|
-| 🐍 Python | 3.11+ |
-| 📦 pip | Latest |
-| 🌿 Git | Latest |
-
-</div>
-
-### ⚡ Instalación Rápida
-
-<details>
-<summary>🪟 <b>Windows</b></summary>
-
-```powershell
-# 1. Clonar el repositorio
-git clone https://github.com/Japaricio2004/ProjectJTec.git
-cd ProjectJTec
-
-# 2. Crear entorno virtual
-python -m venv venv
-venv\Scripts\activate
-
-# 3. Instalar dependencias
-pip install -r requirements.txt
-
-# 4. Inicializar base de datos
-flask db upgrade
-
-# 5. ¡Lanzar! 🚀
-python app.py
-```
-
-</details>
-
-<details>
-<summary>🐧 <b>Linux / Mac</b></summary>
-
-```bash
-# 1. Clonar el repositorio
-git clone https://github.com/Japaricio2004/ProjectJTec.git
-cd ProjectJTec
-
-# 2. Crear entorno virtual
-python3 -m venv venv
-source venv/bin/activate
-
-# 3. Instalar dependencias
-pip install -r requirements.txt
-
-# 4. Inicializar base de datos
-flask db upgrade
-
-# 5. ¡Lanzar! 🚀
-python app.py
-```
-
-</details>
-
-<div align="center">
-
-### 🎉 ¡Listo! La aplicación está corriendo en:
-
-**`http://127.0.0.1:5000`**
-
-</div>
-
-## 📝 Uso del Sistema
+##  Uso del Sistema
 
 ### Registro de Usuarios
 
@@ -277,7 +203,7 @@ python app.py
 
 ---
 
-## 🎨 Diseño Responsive
+## 📊 Modelos de Base de Datos
 
 <div align="center">
 
@@ -290,57 +216,6 @@ python app.py
 | 💻 **Desktop** | 1024px+ | • Grids de hasta 4 columnas<br>• Dashboard completo<br>• Experiencia premium |
 
 </div>
-
----
-
-## 🗺️ Rutas de la API
-
-<table>
-<tr>
-<td width="50%">
-
-### 🔐 Autenticación
-
-```http
-GET  /login           # Página de inicio de sesión
-POST /login           # Autenticar usuario
-GET  /register        # Página de registro
-POST /register        # Crear nuevo usuario
-GET  /logout          # Cerrar sesión
-```
-
-</td>
-<td width="50%">
-
-### 👤 Cliente
-
-```http
-GET  /                # Interfaz pública
-GET  /cliente         # Dashboard cliente
-POST /cliente/buscar  # Buscar orden
-POST /cliente/valorar # Calificar servicio
-```
-
-</td>
-</tr>
-<tr>
-<td width="50%" colspan="2">
-
-### 👨‍🔧 Técnico
-
-```http
-GET  /technician                              # Dashboard técnico
-POST /technician                              # Crear orden
-GET  /technician/interface                    # Interfaz alternativa
-POST /technician/interface/create             # Crear orden
-POST /technician/interface/update/<code>      # Actualizar orden
-POST /technician/interface/delete/<code>      # Eliminar orden
-```
-
-</td>
-</tr>
-</table>
-
 ---
 
 ## � Modelos de Base de Datos
@@ -393,58 +268,71 @@ erDiagram
 </div>
 
 ---
+## � Licencia
 
-## 🤝 Contribución
-
-<div align="center">
-
-### ¿Quieres contribuir? ¡Genial! 🎉
-
-Seguimos el flujo de trabajo **Git Flow**:
-
-```bash
-# 1️⃣ Fork el proyecto
-# 2️⃣ Crea tu rama feature
-git checkout -b feature/AmazingFeature
-
-# 3️⃣ Commit tus cambios
-git commit -m '✨ Add: AmazingFeature'
-
-# 4️⃣ Push a la rama
-git push origin feature/AmazingFeature
-
-# 5️⃣ Abre un Pull Request
-```
-
-### 🏷️ Convenciones de Commits
-
-| Emoji | Tipo | Descripción |
-|:---:|:---:|:---|
-| ✨ | `feat:` | Nueva característica |
-| 🐛 | `fix:` | Corrección de bug |
-| 📝 | `docs:` | Documentación |
-| 💄 | `style:` | Estilos/UI |
-| ♻️ | `refactor:` | Refactorización |
-| ⚡ | `perf:` | Mejora de rendimiento |
-| ✅ | `test:` | Tests |
-
-</div>
-
-## 📄 Licencia
-
-Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
-
-## 👤 Autor
-
-**Japaricio2004**
-- GitHub: [@Japaricio2004](https://github.com/Japaricio2004)
-
-## 🙏 Agradecimientos
-
-- Flask por el excelente framework web
-- TailwindCSS por el sistema de diseño utility-first
-- La comunidad de Python por las herramientas y librerías
+Este proyecto está bajo la **Licencia MIT** - mira el archivo [LICENSE](LICENSE) para más detalles.
 
 ---
 
-⭐ Si este proyecto te resultó útil, considera darle una estrella en GitHub!
+## �‍💻 Autor
+
+<img src="https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white" />
+
+**Japaricio2004**
+
+[![GitHub](https://img.shields.io/badge/GitHub-@Japaricio2004-181717?style=flat&logo=github)](https://github.com/Japaricio2004)
+
+---
+
+## 🌟 Agradecimientos
+
+<table>
+<tr>
+<td align="center">
+<img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" />
+<br />
+<b>Flask Team</b>
+<br />
+Framework web excepcional
+</td>
+<td align="center">
+<img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
+<br />
+<b>Tailwind Labs</b>
+<br />
+Sistema de diseño utility-first
+</td>
+<td align="center">
+<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" />
+<br />
+<b>Python Community</b>
+<br />
+Herramientas y librerías
+</td>
+</tr>
+</table>
+
+---
+
+### 💖 Si este proyecto te resultó útil
+
+<div align="center">
+
+[![GitHub stars](https://img.shields.io/github/stars/Japaricio2004/ProjectJTec?style=social)](https://github.com/Japaricio2004/ProjectJTec/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/Japaricio2004/ProjectJTec?style=social)](https://github.com/Japaricio2004/ProjectJTec/network/members)
+[![GitHub watchers](https://img.shields.io/github/watchers/Japaricio2004/ProjectJTec?style=social)](https://github.com/Japaricio2004/ProjectJTec/watchers)
+
+**⭐ ¡Considera darle una estrella en GitHub! ⭐**
+
+---
+
+<img src="https://img.shields.io/badge/Made_with-❤️-red?style=for-the-badge" />
+<img src="https://img.shields.io/badge/Built_by-JOSETEC_Team-blue?style=for-the-badge" />
+
+**Desarrollado con pasión por un equipo dedicado a la excelencia** 🚀
+
+---
+
+<sub>© 2025 JOSETEC. Todos los derechos reservados.</sub>
+
+</div>
