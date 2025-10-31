@@ -1,5 +1,6 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, redirect, url_for, render_template
 from flask_wtf.csrf import CSRFProtect
+from flask_wtf.csrf import CSRFError
 from flask_migrate import Migrate
 from models.models import db
 
@@ -65,3 +66,11 @@ def handle_500(e):
     app.logger.exception('Internal Server Error: %s', e)
     # Responder con un mensaje genérico
     return "Internal Server Error", 500
+
+
+# Handler para errores de CSRF (muestra un mensaje amigable en lugar de 500)
+@app.errorhandler(CSRFError)
+def handle_csrf(e):
+    app.logger.warning('CSRF error: %s', e)
+    # Devolver la plantilla de register con mensaje de error cuando corresponda
+    return render_template('register.html', error='Token CSRF inválido o expirado. Por favor recarga la página e intenta de nuevo.'), 400

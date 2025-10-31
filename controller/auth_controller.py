@@ -82,63 +82,72 @@ def index():
 
 def register():
     if request.method == "POST":
-        nombre = request.form.get("nombre", "").strip()
-        correo = request.form.get("correo", "").strip().lower()
-        password = request.form.get("password", "")
-        confirm_password = request.form.get("confirm_password", "")
-        rol = request.form.get("rol", "cliente")
-
-        # Validación: campos obligatorios
-        if not all([nombre, correo, password, rol]):
-            return render_template("register.html", error="Todos los campos son obligatorios")
-
-        # Validación: nombre mínimo
-        if len(nombre) < 3:
-            return render_template("register.html", error="El nombre debe tener al menos 3 caracteres")
-
-        # Validación: formato de email básico
-        if '@' not in correo or '.' not in correo.split('@')[-1]:
-            return render_template("register.html", error="Ingresa un correo electrónico válido")
-
-        # Validación: contraseña mínima
-        if len(password) < 6:
-            return render_template("register.html", error="La contraseña debe tener al menos 6 caracteres")
-
-        # Validación: confirmar contraseña
-        if password != confirm_password:
-            return render_template("register.html", error="Las contraseñas no coinciden")
-
-        # Validación: correo único
-        if Usuario.query.filter_by(correo=correo).first():
-            return render_template("register.html", error="El correo ya está registrado")
-
-        # Validación: rol válido
-        if rol not in ['cliente', 'tecnico']:
-            return render_template("register.html", error="Rol inválido")
-
-        hashed = generate_password_hash(password)
-        nuevo_usuario = Usuario(nombre=nombre, correo=correo, password=hashed, rol=rol)
         try:
-            db.session.add(nuevo_usuario)
-            db.session.commit()
-        except IntegrityError:
-            db.session.rollback()
-            # Probablemente el correo ya existe (concusión con race), devolver error amable
-            current_app.logger.exception("IntegrityError al crear usuario")
-            return render_template("register.html", error="El correo ya está registrado")
-        except OperationalError as e:
-            db.session.rollback()
-            # Errores de operación (p. ej. archivo SQLite no escribible en Vercel)
-            current_app.logger.exception("OperationalError al crear usuario: %s", e)
-            # Mensaje amigable y detallado para deployers; no revelar secretos
-            return render_template("register.html", error="Error al guardar en la base de datos. En entornos serverless (Vercel) SQLite puede no ser escribible. Considera usar una base de datos externa (Postgres, MySQL) y configurar DATABASE_URL.")
-        except Exception as e:
-            db.session.rollback()
-            current_app.logger.exception("Error inesperado al crear usuario: %s", e)
-            return render_template("register.html", error="Ocurrió un error al crear la cuenta. Revisa los logs del servidor.")
+            nombre = request.form.get("nombre", "").strip()
+            correo = request.form.get("correo", "").strip().lower()
+            password = request.form.get("password", "")
+            confirm_password = request.form.get("confirm_password", "")
+            rol = request.form.get("rol", "cliente")
 
-        flash("✅ Registro exitoso. Ahora puedes iniciar sesión.", "success")
-        return redirect(url_for("login"))
+            # Validación: campos obligatorios
+            if not all([nombre, correo, password, rol]):
+                return render_template("register.html", error="Todos los campos son obligatorios")
+
+            # Validación: nombre mínimo
+            if len(nombre) < 3:
+                return render_template("register.html", error="El nombre debe tener al menos 3 caracteres")
+
+            # Validación: formato de email básico
+            if '@' not in correo or '.' not in correo.split('@')[-1]:
+                return render_template("register.html", error="Ingresa un correo electrónico válido")
+
+            # Validación: contraseña mínima
+            if len(password) < 6:
+                return render_template("register.html", error="La contraseña debe tener al menos 6 caracteres")
+
+            # Validación: confirmar contraseña
+            if password != confirm_password:
+                return render_template("register.html", error="Las contraseñas no coinciden")
+
+            # Validación: correo único (puede fallar si DB inaccesible)
+            try:
+                if Usuario.query.filter_by(correo=correo).first():
+                    return render_template("register.html", error="El correo ya está registrado")
+            except OperationalError as e:
+                current_app.logger.exception("OperationalError al consultar usuario existente: %s", e)
+                return render_template("register.html", error="Error de conexión a la base de datos. Revisa la configuración de DATABASE_URL del entorno.")
+
+            # Validación: rol válido
+            if rol not in ['cliente', 'tecnico']:
+                return render_template("register.html", error="Rol inválido")
+
+            hashed = generate_password_hash(password)
+            nuevo_usuario = Usuario(nombre=nombre, correo=correo, password=hashed, rol=rol)
+            try:
+                db.session.add(nuevo_usuario)
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                # Probablemente el correo ya existe (condición de carrera), devolver error amable
+                current_app.logger.exception("IntegrityError al crear usuario")
+                return render_template("register.html", error="El correo ya está registrado")
+            except OperationalError as e:
+                db.session.rollback()
+                # Errores de operación (p. ej. archivo SQLite no escribible en Vercel)
+                current_app.logger.exception("OperationalError al crear usuario: %s", e)
+                # Mensaje amigable y detallado para deployers; no revelar secretos
+                return render_template("register.html", error=("Error al guardar en la base de datos. En entornos serverless (Vercel) SQLite puede no ser escribible. "
+                                                               "Considera usar una base de datos externa (Postgres, MySQL) y configurar DATABASE_URL."))
+            except Exception as e:
+                db.session.rollback()
+                current_app.logger.exception("Error inesperado al crear usuario: %s", e)
+                return render_template("register.html", error="Ocurrió un error al crear la cuenta. Revisa los logs del servidor.")
+
+            flash("✅ Registro exitoso. Ahora puedes iniciar sesión.", "success")
+            return redirect(url_for("login"))
+        except Exception as e:
+            current_app.logger.exception("Excepción inesperada en register POST: %s", e)
+            return render_template("register.html", error="Ocurrió un error inesperado al procesar el formulario. Revisa los logs del servidor.")
     
     return render_template("register.html")
 
