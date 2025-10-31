@@ -1,18 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from datetime import datetime
-from zoneinfo import ZoneInfo
+from models.models import PERU_TZ, get_peru_time
 import random
 from models.models import db, Orden, Usuario
 
 # Crear Blueprint
 technician = Blueprint('technician', __name__)
 
-# Zona horaria de Perú
-PERU_TZ = ZoneInfo("America/Lima")
-
-def get_peru_time():
-    """Retorna la hora actual en zona horaria de Perú (sin timezone info para SQLite)"""
-    return datetime.now(PERU_TZ).replace(tzinfo=None)
+# Usamos get_peru_time y PERU_TZ desde models.models para consistencia y
+# para evitar fallos donde ZoneInfo no esté disponible.
 
 # Definir estados válidos del sistema
 ESTADOS_ORDEN = [
@@ -80,12 +76,16 @@ def technician_dashboard():
     # Pasar los datos COMPLETOS al template
     orders = []
     for o in ordenes:
-        # Para fechas antiguas (UTC), restar 5 horas. Las nuevas ya están en hora de Perú
-        # Detectamos fechas UTC si la hora es muy diferente (aproximación simple)
+        # Las fechas nuevas se guardan con get_peru_time() (naïve en hora de Perú).
+        # No forzamos conversión desde UTC para valores naïve. Solo convertimos
+        # cuando la fecha es aware (tiene tzinfo).
         fecha_mostrar = o.fecha_creacion
-        if fecha_mostrar:
-            # Si la fecha parece estar en UTC (hora muy adelantada), convertir
-            fecha_mostrar = fecha_mostrar.replace(tzinfo=ZoneInfo('UTC')).astimezone(PERU_TZ).replace(tzinfo=None)
+        if fecha_mostrar and getattr(fecha_mostrar, 'tzinfo', None) is not None:
+            try:
+                if PERU_TZ is not None:
+                    fecha_mostrar = fecha_mostrar.astimezone(PERU_TZ).replace(tzinfo=None)
+            except Exception:
+                pass
         
         orders.append({
             'trackingCode': o.codigo,

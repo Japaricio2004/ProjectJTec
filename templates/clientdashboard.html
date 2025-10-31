@@ -124,7 +124,7 @@
             </div>
             <div>
               <p class="text-sm text-blue-200">Fecha de Ingreso</p>
-              <p class="text-white font-medium">{{ orden.fecha_creacion.strftime('%d %b %Y') if orden.fecha_creacion else 'N/A' }}</p>
+              <p class="text-white font-medium">{{ orden.fecha_creacion.strftime('%Y-%m-%d %H:%M:%S.%f') if orden.fecha_creacion else 'N/A' }}</p>
             </div>
           </div>
         </div>

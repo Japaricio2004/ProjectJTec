@@ -1,9 +1,6 @@
 from flask import render_template, request, redirect, url_for, flash, session
-from models.models import db, Orden, Valoracion
-from zoneinfo import ZoneInfo
-
-# Zona horaria de Perú
-PERU_TZ = ZoneInfo("America/Lima")
+from models.models import db, Orden, Valoracion, PERU_TZ
+from datetime import datetime
 
 def client_interface():
     # Cualquier usuario puede consultar con código; no forzamos rol
@@ -72,14 +69,26 @@ def client_interface():
             }
             
             # Crear diccionario con los datos formateados para el template
-            # Convertir fechas antiguas (UTC) a hora de Perú
+            # Las fechas nuevas se guardan con get_peru_time() (naïve en hora de Perú).
+            # No forzamos conversión desde UTC para valores naïve porque eso desplaza
+            # la hora (-5h) si ya están en hora de Perú. Solo convertimos cuando la
+            # fecha proviene como aware (tiene tzinfo) y necesitamos mostrarla en
+            # zona Perú.
             fecha_creacion_mostrar = orden.fecha_creacion
-            if fecha_creacion_mostrar:
-                fecha_creacion_mostrar = fecha_creacion_mostrar.replace(tzinfo=ZoneInfo('UTC')).astimezone(PERU_TZ).replace(tzinfo=None)
-            
+            if fecha_creacion_mostrar and getattr(fecha_creacion_mostrar, 'tzinfo', None) is not None:
+                try:
+                    if PERU_TZ is not None:
+                        fecha_creacion_mostrar = fecha_creacion_mostrar.astimezone(PERU_TZ).replace(tzinfo=None)
+                except Exception:
+                    pass
+
             fecha_actualizacion_mostrar = orden.fecha_actualizacion
-            if fecha_actualizacion_mostrar:
-                fecha_actualizacion_mostrar = fecha_actualizacion_mostrar.replace(tzinfo=ZoneInfo('UTC')).astimezone(PERU_TZ).replace(tzinfo=None)
+            if fecha_actualizacion_mostrar and getattr(fecha_actualizacion_mostrar, 'tzinfo', None) is not None:
+                try:
+                    if PERU_TZ is not None:
+                        fecha_actualizacion_mostrar = fecha_actualizacion_mostrar.astimezone(PERU_TZ).replace(tzinfo=None)
+                except Exception:
+                    pass
             
             # Buscar valoración existente
             valoracion = Valoracion.query.filter_by(orden_id=orden.id).first()
@@ -124,15 +133,18 @@ def _preparar_orden_para_template(orden: Orden):
     orden.costo_reparacion = orden.repair_cost
     orden.telefono_cliente = orden.cliente_telefono
     orden.correo_cliente = orden.cliente_email
-    # Fechas ya suelen estar en hora local; si vienen antiguas UTC, convertir para mostrar
+    # Fechas ya suelen estar en hora local; no forzamos conversión para datetimes
+    # naïve. Solo convertimos cuando la fecha es aware (tiene tzinfo).
     if orden.fecha_creacion:
         try:
-            orden.fecha_creacion = orden.fecha_creacion.replace(tzinfo=ZoneInfo('UTC')).astimezone(PERU_TZ).replace(tzinfo=None)
+            if getattr(orden.fecha_creacion, 'tzinfo', None) is not None and PERU_TZ is not None:
+                orden.fecha_creacion = orden.fecha_creacion.astimezone(PERU_TZ).replace(tzinfo=None)
         except Exception:
             pass
     if orden.fecha_actualizacion:
         try:
-            orden.fecha_actualizacion = orden.fecha_actualizacion.replace(tzinfo=ZoneInfo('UTC')).astimezone(PERU_TZ).replace(tzinfo=None)
+            if getattr(orden.fecha_actualizacion, 'tzinfo', None) is not None and PERU_TZ is not None:
+                orden.fecha_actualizacion = orden.fecha_actualizacion.astimezone(PERU_TZ).replace(tzinfo=None)
         except Exception:
             pass
     return orden

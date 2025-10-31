@@ -2,14 +2,26 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+
 db = SQLAlchemy()
 
-# Zona horaria de Perú
-PERU_TZ = ZoneInfo("America/Lima")
+# Intentamos cargar la zona horaria de Perú. En algunos entornos (p.ej. ciertos
+# contenedores o plataformas) la base de datos de zonas horarias puede no estar
+# disponible y ZoneInfo(...) lanzará ZoneInfoNotFoundError. En ese caso hacemos
+# un fallback a UTC para evitar que la importación falle y provoque un 500.
+try:
+    PERU_TZ = ZoneInfo("America/Lima")
+except Exception:
+    PERU_TZ = None
+
 
 def get_peru_time():
-    """Retorna la hora actual en zona horaria de Perú (sin timezone info para SQLite)"""
-    return datetime.now(PERU_TZ).replace(tzinfo=None)
+    """Retorna la hora actual en zona horaria de Perú si está disponible;
+    si no, retorna UTC. Se elimina la info de tz antes de guardarlo en SQLite."""
+    if PERU_TZ is not None:
+        return datetime.now(PERU_TZ).replace(tzinfo=None)
+    # Fallback seguro: usar UTC
+    return datetime.utcnow()
 
 class Usuario(db.Model):
     __tablename__ = "usuarios"

@@ -99,11 +99,11 @@
           <div class="p-6 space-y-3 text-sm">
             <div class="flex items-center justify-between">
               <p class="text-blue-200">Creada:</p>
-              <p class="text-white">{{ order.fecha_creacion.strftime('%d/%m/%Y %H:%M') if order.fecha_creacion else '-' }}</p>
+              <p class="text-white">{{ order.fecha_creacion.strftime('%Y-%m-%d %H:%M:%S.%f') if order.fecha_creacion else '-' }}</p>
             </div>
             <div class="flex items-center justify-between">
               <p class="text-blue-200">Última actualización:</p>
-              <p class="text-white">{{ order.fecha_actualizacion.strftime('%d/%m/%Y %H:%M') if order.fecha_actualizacion else '-' }}</p>
+              <p class="text-white">{{ order.fecha_actualizacion.strftime('%Y-%m-%d %H:%M:%S.%f') if order.fecha_actualizacion else '-' }}</p>
             </div>
           </div>
         </div>
