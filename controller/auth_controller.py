@@ -1,7 +1,8 @@
-from flask import render_template, request, redirect, url_for, session, flash
+from flask import render_template, request, redirect, url_for, session, flash, current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 from models.models import db, Usuario, Orden, Valoracion
 from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError, OperationalError
 from datetime import datetime
 
 def index():
@@ -117,9 +118,25 @@ def register():
 
         hashed = generate_password_hash(password)
         nuevo_usuario = Usuario(nombre=nombre, correo=correo, password=hashed, rol=rol)
-        db.session.add(nuevo_usuario)
-        db.session.commit()
-        
+        try:
+            db.session.add(nuevo_usuario)
+            db.session.commit()
+        except IntegrityError:
+            db.session.rollback()
+            # Probablemente el correo ya existe (concusión con race), devolver error amable
+            current_app.logger.exception("IntegrityError al crear usuario")
+            return render_template("register.html", error="El correo ya está registrado")
+        except OperationalError as e:
+            db.session.rollback()
+            # Errores de operación (p. ej. archivo SQLite no escribible en Vercel)
+            current_app.logger.exception("OperationalError al crear usuario: %s", e)
+            # Mensaje amigable y detallado para deployers; no revelar secretos
+            return render_template("register.html", error="Error al guardar en la base de datos. En entornos serverless (Vercel) SQLite puede no ser escribible. Considera usar una base de datos externa (Postgres, MySQL) y configurar DATABASE_URL.")
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.exception("Error inesperado al crear usuario: %s", e)
+            return render_template("register.html", error="Ocurrió un error al crear la cuenta. Revisa los logs del servidor.")
+
         flash("✅ Registro exitoso. Ahora puedes iniciar sesión.", "success")
         return redirect(url_for("login"))
     

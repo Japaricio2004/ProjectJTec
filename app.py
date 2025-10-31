@@ -8,9 +8,21 @@ from controller.auth_controller import register, login, logout
 from controller.client_controller import client_interface, client_dashboard, cliente_buscar, cliente_valorar
 from controller.technician_controller import technician
 
+import os
+
 app = Flask(__name__)
-app.secret_key = "clave_secreta_segura"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+# Usar SECRET_KEY desde variable de entorno si está disponible
+app.secret_key = os.environ.get("SECRET_KEY", "clave_secreta_segura")
+
+# Configurar URI de la BD desde la variable de entorno DATABASE_URL cuando exista.
+# En Vercel o plataformas externas deberías configurar DATABASE_URL a tu Postgres/MySQL.
+# Si no existe, se usa SQLite local (útil para desarrollo), pero NO es recomendable
+# para despliegues en Vercel porque el filesystem no es escribible/permanente.
+database_url = os.environ.get("DATABASE_URL", "sqlite:///database.db")
+# Algunos proveedores usan el esquema 'postgres://' que SQLAlchemy ya no acepta
+if database_url.startswith('postgres://'):
+    database_url = database_url.replace('postgres://', 'postgresql://', 1)
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 # Configurar CSRF
@@ -44,3 +56,12 @@ app.register_blueprint(technician)
 
 if __name__ == "__main__":
     app.run(debug=True)
+
+
+# Handler global para registrar excepciones 500 y devolver una página amigable.
+@app.errorhandler(500)
+def handle_500(e):
+    # Loguear la excepción para que aparezca en los logs de Vercel
+    app.logger.exception('Internal Server Error: %s', e)
+    # Responder con un mensaje genérico
+    return "Internal Server Error", 500
