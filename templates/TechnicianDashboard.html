@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+{% block title %}Panel Técnico{% endblock %}
+{% block content %}
+<div class="min-h-[60vh]">
+  <h1 class="text-2xl font-semibold text-white mb-6">Panel Técnico</h1>
+  
+  <!-- Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    {% set total = orders|length if orders is defined else 0 %}
+    {% set en_proceso = (orders | selectattr('status', 'in', ['EN DIAGNÓSTICO','EN REPARACIÓN']) | list | length) if orders is defined else 0 %}
+    {% set esperando = (orders | selectattr('status', 'equalto', 'ESPERA DE APROBACIÓN') | list | length) if orders is defined else 0 %}
+    {% set completadas = (orders | selectattr('status', 'equalto', 'ENTREGADO') | list | length) if orders is defined else 0 %}
+
+    {% set stats = [
+      {'title':'Total Órdenes','value': total, 'bg':'bg-blue-500/20','color':'text-blue-400', 'icon':'package', 'border':'border-blue-500/30'},
+      {'title':'En Proceso','value': en_proceso, 'bg':'bg-purple-500/20','color':'text-purple-400','icon':'wrench', 'border':'border-purple-500/30'},
+      {'title':'Esperando Aprobación','value': esperando,'bg':'bg-amber-500/20','color':'text-amber-400','icon':'alert', 'border':'border-amber-500/30'},
+      {'title':'Completadas','value': completadas,'bg':'bg-green-500/20','color':'text-green-400','icon':'check', 'border':'border-green-500/30'}
+    ] %}
+
+    {% for stat in stats %}
+    <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20 p-6 hover:bg-white/15 transition-all duration-300">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm text-blue-200 mb-1">{{ stat.title }}</p>
+          <p class="text-3xl font-bold text-white">{{ stat.value }}</p>
+        </div>
+        <div class="{{ stat.bg }} {{ stat.border }} p-3 rounded-lg border">
+          {% if stat.icon == 'package' %}
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 {{ stat.color }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+          {% elif stat.icon == 'wrench' %}
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 {{ stat.color }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m14.7 6.3 3 3L7 20H4v-3Z"/><path d="m13.2 7.8 3 3"/></svg>
+          {% elif stat.icon == 'alert' %}
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 {{ stat.color }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+          {% elif stat.icon == 'check' %}
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 {{ stat.color }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Tabs -->
+  <div class="space-y-6">
+    <div class="inline-flex flex-wrap bg-white/10 backdrop-blur-sm text-white p-1 border border-white/20 rounded-lg w-full sm:w-auto">
+      {% set active = request.args.get('tab','create') %}
+      <a href="{{ url_for('technician.technician_dashboard') }}?tab=create" class="flex-1 sm:flex-none px-3 md:px-4 py-2 text-xs md:text-sm rounded-md {{ 'bg-white/20' if active=='create' else 'hover:bg-white/10' }} inline-flex items-center justify-center gap-2 transition-all duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+        <span class="hidden sm:inline">Nueva Orden</span>
+        <span class="sm:hidden">Nueva</span>
+      </a>
+      <a href="{{ url_for('technician.technician_dashboard') }}?tab=update" class="flex-1 sm:flex-none px-3 md:px-4 py-2 text-xs md:text-sm rounded-md {{ 'bg-white/20' if active=='update' else 'hover:bg-white/10' }} inline-flex items-center justify-center gap-2 transition-all duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <span class="hidden sm:inline">Buscar y Actualizar</span>
+        <span class="sm:hidden">Buscar</span>
+      </a>
+      <a href="{{ url_for('technician.technician_dashboard') }}?tab=list" class="flex-1 sm:flex-none px-3 md:px-4 py-2 text-xs md:text-sm rounded-md {{ 'bg-white/20' if active=='list' else 'hover:bg-white/10' }} inline-flex items-center justify-center gap-2 transition-all duration-200">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+        <span class="hidden sm:inline">Todas las Órdenes</span>
+        <span class="sm:hidden">Todas</span>
+      </a>
+    </div>
+
+    {% set get_status_color = {
+      'RECIBIDO': 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+      'EN DIAGNÓSTICO': 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+      'ESPERA DE APROBACIÓN': 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+      'EN REPARACIÓN': 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
+      'REPARADO': 'bg-green-500/20 text-green-400 border-green-500/30',
+      'ENTREGADO': 'bg-gray-500/20 text-gray-400 border-gray-500/30'
+    } %}
+
+    <!-- Create Tab -->
+    {% if active == 'create' %}
+    <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+      <div class="p-6 border-b border-white/20">
+        <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+          Crear Nueva Orden
+        </h3>
+        <p class="text-sm text-blue-200">Registra un nuevo dispositivo para reparación</p>
+      </div>
+      <div class="p-6">
+        <form method="post" action="{{ url_for('technician.technician_dashboard') }}" class="space-y-6">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <!-- Cliente -->
+          <div>
+            <h4 class="text-white mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              Información del Cliente
+            </h4>
+            <div class="grid md:grid-cols-3 gap-4">
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-white" for="clientName">Nombre Completo</label>
+                <input id="clientName" name="clientName" placeholder="Juan Pérez" class="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-white" for="clientPhone">Teléfono</label>
+                <div class="relative">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.86 19.86 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.86 19.86 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.66 12.66 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8 9a16 16 0 0 0 7 7l.36-.36a2 2 0 0 1 2.11-.45 12.66 12.66 0 0 0 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+                  <input id="clientPhone" name="clientPhone" placeholder="+51 986 456 234" class="w-full rounded-md border border-white/20 bg-white/10 pl-10 px-3 py-2 text-sm text-white placeholder-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+                </div>
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-white" for="clientEmail">Email</label>
+                <div class="relative">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-blue-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6c0-1.1.9-2 2-2Z"/><path d="m22 6-10 7L2 6"/></svg>
+                  <input id="clientEmail" type="email" name="clientEmail" placeholder="cliente@ejemplo.com" class="w-full rounded-md border border-white/20 bg-white/10 pl-10 px-3 py-2 text-sm text-white placeholder-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <hr class="h-px bg-white/20 border-0" />
+
+          <!-- Dispositivo -->
+          <div>
+            <h4 class="text-white mb-4 flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg>
+              Información del Dispositivo
+            </h4>
+            <div class="grid md:grid-cols-3 gap-4">
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-white" for="deviceType">Tipo de Dispositivo</label>
+                <input id="deviceType" name="deviceType" placeholder="Smartphone, Tablet..." class="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-white" for="deviceBrand">Marca</label>
+                <input id="deviceBrand" name="deviceBrand" placeholder="Apple, Samsung..." class="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+              </div>
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-white" for="deviceModel">Modelo</label>
+                <input id="deviceModel" name="deviceModel" placeholder="iPhone 14 Pro..." class="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent" required />
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-white" for="reportedIssue">Falla Reportada</label>
+            <textarea id="reportedIssue" name="reportedIssue" rows="4" placeholder="Describe detalladamente el problema..." class="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+          </div>
+
+          <button type="submit" class="w-full rounded-md px-4 py-2 text-white text-sm font-medium bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 inline-flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" x2="12" y1="5" y2="19"/><line x1="5" x2="19" y1="12" y2="12"/></svg>
+            Crear Orden
+          </button>
+        </form>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Update Tab -->
+    {% if active == 'update' %}
+    <div class="space-y-6">
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+        <div class="p-6 border-b border-white/20">
+          <h3 class="text-lg font-semibold text-white flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            Buscar Orden
+          </h3>
+          <p class="text-sm text-blue-200">Ingresa el código de seguimiento</p>
+        </div>
+        <div class="p-6">
+          <form method="get" action="{{ url_for('technician.technician_dashboard') }}" class="flex gap-3">
+            <input type="hidden" name="tab" value="update" />
+            <input name="code" value="{{ request.args.get('code','') }}" placeholder="Ej: DEMO1234" class="uppercase flex-1 rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            <button class="rounded-md px-4 py-2 text-white text-sm font-medium bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 inline-flex items-center transition-all duration-200 shadow-lg hover:shadow-xl">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+              Buscar
+            </button>
+          </form>
+        </div>
+      </div>
+
+      {% if selected %}
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+        <div class="p-6 border-b border-white/20 flex items-center justify-between">
+          <div>
+            <h4 class="text-lg font-semibold text-white">Orden: {{ selected.trackingCode }}</h4>
+            <p class="text-sm text-blue-200">{{ selected.deviceBrand }} {{ selected.deviceModel }}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded-full text-xs font-medium border {{ get_status_color.get(selected.status,'bg-gray-500/20 text-gray-400 border-gray-500/30') }}">{{ selected.status }}</span>
+            <form method="post" action="{{ url_for('technician.ti_delete_order', trackingCode=selected.trackingCode) }}" class="delete-order-form" data-order-code="{{ selected.trackingCode }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="px-3 py-1 text-sm rounded-md bg-red-600 text-white hover:bg-red-700">Eliminar Orden</button>
+            </form>
+          </div>
+        </div>
+        <div class="p-6 space-y-6">
+          <div class="grid md:grid-cols-2 gap-6">
+            <div class="space-y-3">
+              <div>
+                <p class="text-sm text-blue-200">Cliente</p>
+                <p class="text-white font-medium">{{ selected.cliente }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-blue-200">Teléfono</p>
+                <p class="text-white font-medium">{{ selected.cliente_telefono }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-blue-200">Email</p>
+                <p class="text-white font-medium">{{ selected.cliente_email }}</p>
+              </div>
+            </div>
+            <div class="bg-blue-500/10 p-4 rounded-lg border border-blue-500/20">
+              <p class="text-sm text-blue-200 mb-2">Falla Reportada</p>
+              <p class="text-white">{{ selected.reportedIssue }}</p>
+            </div>
+          </div>
+
+          <hr class="h-px bg-white/20 border-0" />
+
+          <form method="post" action="{{ url_for('technician.ti_update_order', trackingCode=selected.trackingCode) }}" class="space-y-4">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-white" for="status">Estado de la Orden</label>
+              <!-- Custom Select (fondo tipo panel) -->
+              <div class="relative" data-status-select>
+                <input type="hidden" name="status" value="{{ selected.status }}">
+                <button type="button" class="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent select-glass custom-select-trigger inline-flex items-center justify-between" aria-haspopup="listbox" aria-expanded="false">
+                  <span class="current-status">{{ selected.status }}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 ml-2 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+                <div class="custom-select-menu absolute left-0 right-0 mt-1 z-50 rounded-md border border-white/20 text-white shadow-xl max-h-60 overflow-y-auto overflow-x-hidden hidden pt-2 pb-2 space-y-1" role="listbox">
+                    {% for s in ['RECIBIDO','EN DIAGNÓSTICO','ESPERA DE APROBACIÓN','EN REPARACIÓN','REPARADO','ENTREGADO'] %}
+                  <div class="custom-select-option w-full px-3 py-2 text-sm cursor-pointer" data-value="{{ s }}" role="option" aria-selected="{{ 'true' if selected.status==s else 'false' }}">{{ s }}</div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-white" for="diagnosis">Diagnóstico</label>
+              <textarea id="diagnosis" name="diagnosis" rows="3" placeholder="Diagnóstico técnico detallado..." class="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ selected.diagnosis or '' }}</textarea>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-white" for="requiredParts">Piezas Requeridas</label>
+              <textarea id="requiredParts" name="requiredParts" rows="3" placeholder="Lista de piezas necesarias..." class="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent">{{ selected.requiredParts or '' }}</textarea>
+            </div>
+
+            <div class="space-y-2">
+              <label class="text-sm font-medium text-white" for="repairCost">Costo de Reparación</label>
+              <input id="repairCost" name="repairCost" value="{{ selected.repairCost or '' }}" placeholder="S/150.00" class="w-full rounded-md border border-white/20 bg-white/10 px-3 py-2 text-sm text-white placeholder-blue-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+            </div>
+
+            <button type="submit" class="w-full rounded-md px-4 py-2 text-white text-sm font-medium bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 inline-flex items-center justify-center transition-all duration-200 shadow-lg hover:shadow-xl">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+              Actualizar Orden
+            </button>
+          </form>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- List Tab -->
+    {% if active == 'list' %}
+    <div class="bg-white/10 backdrop-blur-sm rounded-xl border border-white/20">
+      <div class="p-6 border-b border-white/20">
+        <h3 class="text-lg font-semibold text-white">Todas las Órdenes</h3>
+        <p class="text-sm text-blue-200">{{ (orders|length) if orders is defined else 0 }} órdenes registradas</p>
+      </div>
+      <div class="p-6">
+        {% if orders and orders|length > 0 %}
+        <div class="space-y-4">
+          {% for o in orders %}
+          <div class="border border-white/20 rounded-lg p-4 hover:bg-white/5 transition-all duration-300">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+              <div class="flex-1">
+                <div class="flex flex-wrap items-center gap-2 md:gap-3 mb-2">
+                  <p class="text-white font-medium text-sm md:text-base">{{ o.trackingCode }}</p>
+                  <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium border {{ get_status_color.get(o.status,'bg-gray-500/20 text-gray-400 border-gray-500/30') }}">{{ o.status }}</span>
+                </div>
+                <p class="text-xs md:text-sm text-blue-200 mb-1">{{ o.cliente }} - {{ o.deviceBrand }} {{ o.deviceModel }}</p>
+                <p class="text-xs md:text-sm text-blue-300">{{ o.createdAt }}</p>
+              </div>
+              <div class="flex flex-col sm:flex-row gap-2">
+                <a href="{{ url_for('technician.technician_dashboard') }}?tab=update&code={{ o.trackingCode }}" class="inline-flex items-center justify-center rounded-md border border-white/20 px-3 py-2 text-xs md:text-sm bg-white/10 hover:bg-white/20 text-white transition-all duration-200">Ver Detalles</a>
+                <form method="post" action="{{ url_for('technician.ti_delete_order', trackingCode=o.trackingCode) }}" class="delete-order-form w-full sm:w-auto" data-order-code="{{ o.trackingCode }}">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center rounded-md border border-red-400 px-3 py-2 text-xs md:text-sm bg-red-600/80 hover:bg-red-600 text-white transition-all duration-200">Eliminar</button>
+                </form>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12 text-blue-300 mx-auto mb-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 9.4 7.55 4.24"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/></svg>
+          <p class="text-blue-300">No hay órdenes registradas</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
