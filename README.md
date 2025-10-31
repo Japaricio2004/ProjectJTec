@@ -201,8 +201,6 @@ RECIBIDO → EN DIAGNÓSTICO → ESPERA DE APROBACIÓN
    - Seleccionar calificación (1-5 estrellas)
    - Agregar comentario opcional
 
----
-
 <div align="center">
 
 ### 📱 Adaptable a Cualquier Dispositivo
