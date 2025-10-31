@@ -286,34 +286,6 @@ Este proyecto está bajo la **Licencia MIT** - mira el archivo [LICENSE](LICENSE
 
 ## 🌟 Agradecimientos
 
-<table>
-<tr>
-<td align="center">
-<img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" />
-<br />
-<b>Flask Team</b>
-<br />
-Framework web excepcional
-</td>
-<td align="center">
-<img src="https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" />
-<br />
-<b>Tailwind Labs</b>
-<br />
-Sistema de diseño utility-first
-</td>
-<td align="center">
-<img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" />
-<br />
-<b>Python Community</b>
-<br />
-Herramientas y librerías
-</td>
-</tr>
-</table>
-
----
-
 ### 💖 Si este proyecto te resultó útil
 
 <div align="center">
