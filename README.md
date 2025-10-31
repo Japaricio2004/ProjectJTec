@@ -203,8 +203,6 @@ RECIBIDO → EN DIAGNÓSTICO → ESPERA DE APROBACIÓN
 
 ---
 
-## 📊 Modelos de Base de Datos
-
 <div align="center">
 
 ### 📱 Adaptable a Cualquier Dispositivo
